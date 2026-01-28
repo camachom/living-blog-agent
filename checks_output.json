@@ -1,0 +1,24 @@
+{
+  "checks": [
+    {
+      "type": "link_check",
+      "urls": [
+        "https://github.com/camachom/drum-dynamics",
+        "https://freesound.org/people/George_Papargyris/sounds/837177/",
+        "https://freesound.org/people/Stereo%20Surgeon/sounds/266093/",
+        "https://en.wikipedia.org/wiki/Root_mean_square"
+      ]
+    },
+    {
+      "type": "claim_extract",
+      "claims": [
+        "The script uses a threshold defined as np.mean(envelope) * 1.2 to detect a hit.",
+        "The script classifies hits as ghost, normal or accent based on amplitude percentiles: <= 20th percentile ghost, >= 80th percentile accent, otherwise normal.",
+        "The script requires manual tuning of the threshold based on input, limiting its generalizability.",
+        "The approach does not use AI for classification but aims to add sophistication in future versions.",
+        "The author built a script to extract hit times and amplitudes from a drum recording and classify dynamics without AI.",
+        "The script is currently not designed for real-time analysis but for file analysis."
+      ]
+    }
+  ]
+}
