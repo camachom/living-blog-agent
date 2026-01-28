@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
-require "dotenv/load"
-require_relative "../lib/living_blog"
+# frozen_string_literal: true
 
-LivingBlog::Update.new.run!(dry_run: ENV["DRY_RUN"] == "true")
+require 'dotenv/load'
+require_relative '../lib/living_blog'
+
+begin
+  LivingBlog::Update.new.run!(dry_run: ENV['DRY_RUN'] == 'true')
+rescue LivingBlog::Error => e
+  puts "[living-blog] #{e.message}"
+end
