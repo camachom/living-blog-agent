@@ -5,12 +5,14 @@ require 'shellwords'
 
 module LivingBlog
   class Writer
+    include LivingBlog::Utils
+    
     def initialize(results)
       @repo = ENV.fetch('REPO')
+      @token       = ENV.fetch('GITHUB_TOKEN')
       @post_path   = ENV.fetch('POST_PATH') # e.g. "content/posts/detecting-drum-hits/index.md"
       @author_name = ENV.fetch('GIT_AUTHOR_NAME', 'Living Blog Agent')
       @author_email = ENV.fetch('GIT_AUTHOR_EMAIL', 'living-blog-agent@users.noreply.github.com')
-      @token       = ENV.fetch('GITHUB_TOKEN')
       @base_branch = ENV.fetch('BASE_BRANCH', 'main')
       @new_branch_name = "living-blog/update-#{Time.now.utc.strftime('%Y%m%d-%H%M%S')}"
       @results = results
@@ -25,6 +27,7 @@ module LivingBlog
           Dir.chdir('repo') do
             pull_and_clone!
             update_file!
+            commit_and_push!
             open_pr!
           end
         end
@@ -34,7 +37,10 @@ module LivingBlog
     private
 
     def broken_links
-      results[:links].filter { |link| link[:ok] != true }
+      binding.pry
+      @results["checks"]
+        .find {|check| check["type"] == 'link_check'}
+        .filter { |link| link["ok"] != true }
     end
 
     def pull_and_clone!
@@ -59,11 +65,20 @@ module LivingBlog
         #{'    '}
         ## Update (#{current})
 
-            - the following links are broken:
-            #{broken_links}
+        - the following links are broken:
+        #{broken_links}
       MD
 
       File.write(full_path, content + update_block)
+    end
+
+    def commit_and_push!
+      sh!("git add #{Shellwords.escape(@post_path)}")
+      sh!("git -c user.name=#{Shellwords.escape(@author_name)} " \
+          "-c user.email=#{Shellwords.escape(@author_email)} " \
+          "commit -m #{Shellwords.escape('Add Living Blog update section')}")
+
+      sh!("git push origin #{Shellwords.escape(@new_branch_name)}")
     end
 
     def open_pr!
@@ -79,12 +94,6 @@ module LivingBlog
       )
 
       puts "Opened PR: #{pr.html_url}"
-    end
-
-    def sh!(cmd)
-      puts "+ #{cmd}"
-      ok = system(cmd)
-      raise Error, "Command failed: #{cmd}" unless ok
     end
   end
 end

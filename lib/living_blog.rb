@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'pry'
+require_relative 'living_blog/utils'
 require_relative 'living_blog/update'
 require_relative 'living_blog/planner'
 require_relative 'living_blog/openai_client'

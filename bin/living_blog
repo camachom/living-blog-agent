@@ -5,7 +5,7 @@ require 'dotenv/load'
 require_relative '../lib/living_blog'
 
 begin
-  LivingBlog::Update.new.run!(dry_run: ENV['DRY_RUN'] == 'true')
+  LivingBlog.run!(dry_run: ENV['DRY_RUN'] == 'true')
 rescue LivingBlog::Error => e
   puts "[living-blog] #{e.message}"
 end

@@ -17,9 +17,13 @@ module LivingBlog
         check_link(link)
       end
 
-      return unless should_open_pr?
-
-      Writer.new(@result).write!
+      if should_open_pr?
+        Writer.new(@result).write!
+      else
+        puts "###############"
+        puts "Blog up to date!"
+        puts "###############"
+      end
     end
 
     private
