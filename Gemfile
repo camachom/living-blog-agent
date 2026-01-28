@@ -9,5 +9,6 @@ gem 'octokit', '~> 10.0'
 gem 'dotenv', '~> 3.2'
 
 group :development do
+  gem 'pry', '~> 0.14'
   gem 'rubocop', '~> 1.72', require: false
 end
