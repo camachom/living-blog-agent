@@ -5,20 +5,19 @@ require 'spec_helper'
 RSpec.describe LivingBlog::Writer do
   let(:results) do
     {
-      'checks' => [
+      links: [
         {
-          'type' => 'link_check',
-          'url' => 'https://example.com/broken',
-          'status' => 404,
-          'ok' => false
+          url: 'https://example.com/broken',
+          status: 404,
+          ok: false
         },
         {
-          'type' => 'link_check',
-          'url' => 'https://example.com/working',
-          'status' => 200,
-          'ok' => true
+          url: 'https://example.com/working',
+          status: 200,
+          ok: true
         }
-      ]
+      ],
+      claims: []
     }
   end
 
@@ -77,15 +76,9 @@ RSpec.describe LivingBlog::Writer do
     it 'filters results to only broken links' do
       writer = described_class.new(results)
 
-      # Note: The current implementation has a bug - it calls find instead of select
-      # and then filter on the result. This test documents expected behavior.
-      # The actual implementation may need fixing.
-      allow(writer).to receive(:binding).and_return(double(pry: nil))
-
-      # Skip this test as the implementation has issues
       broken = writer.send(:broken_links)
       expect(broken.length).to eq(1)
-      expect(broken.first['url']).to eq('https://example.com/broken')
+      expect(broken.first[:url]).to eq('https://example.com/broken')
     end
   end
 

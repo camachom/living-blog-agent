@@ -37,10 +37,7 @@ module LivingBlog
     private
 
     def broken_links
-      binding.pry
-      @results["checks"]
-        .select {|check| check["type"] == 'link_check'}
-        .filter { |link| link["ok"] != true }
+      @results[:links].filter { |link| link[:ok] != true }
     end
 
     def pull_and_clone!
