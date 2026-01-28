@@ -39,7 +39,7 @@ module LivingBlog
     def broken_links
       binding.pry
       @results["checks"]
-        .find {|check| check["type"] == 'link_check'}
+        .select {|check| check["type"] == 'link_check'}
         .filter { |link| link["ok"] != true }
     end
 
