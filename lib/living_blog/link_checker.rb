@@ -5,24 +5,32 @@ require 'net/http'
 module LivingBlog
   class LinkChecker
     def initialize(links)
-      @links = links
+      @links = links.uniq.filter { |link| !link.include?('mailto:') }
+      @result = {
+        links: [],
+        claims: []
+      }
     end
 
     def check!
-      results = []
-
       @links.each do |link|
-        check_link(link, results)
+        check_link(link)
       end
 
-      results
+      return unless should_open_pr?
+
+      Writer.new(@result).write!
     end
 
     private
 
-    def check_link(link, results, limit = 3)
+    def should_open_pr?
+      @result[:links].any? { |link| link[:ok] != true }
+    end
+
+    def check_link(link, limit = 3)
       if limit <= 0
-        results << {
+        @result[:links] << {
           url: link,
           status: nil,
           ok: false,
@@ -49,9 +57,9 @@ module LivingBlog
           location = res.header['Location']
           next_uri = URI(location).absolute? ? URI(location) : uri.merge(location).to_s
 
-          check_link(next_uri.to_s, results, limit - 1)
+          check_link(next_uri.to_s, limit - 1)
         else
-          results << {
+          @result[:links] << {
             url: link,
             status: res.code.to_i,
             ok: res.is_a?(Net::HTTPSuccess)
@@ -60,7 +68,7 @@ module LivingBlog
       end
     rescue StandardError => e
       puts "Error checking #{link}: #{e.message}"
-      results << {
+      @result[:links] << {
         url: link,
         status: nil,
         ok: false,
