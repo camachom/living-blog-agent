@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require "dotenv/load"
+require_relative "../lib/living_blog"
+
+LivingBlog::Update.new.run!(dry_run: ENV["DRY_RUN"] == "true")
